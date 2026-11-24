@@ -1,15 +1,97 @@
 <!doctype html>
 <html lang="en">
 <head>
-<meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Token Radar: pre-token protocols ranked by implied value</title>
-<link rel="stylesheet" href="app.css">
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="color-scheme" content="light">
+  <title>Token Radar | Launch research</title>
+  <link rel="stylesheet" href="app.css">
+  <script defer src="../data.js"></script>
+  <script defer src="app.js"></script>
 </head>
 <body>
-<a class="skip" href="#board">Skip to the board</a>
-<main id="board" tabindex="-1" aria-busy="true"></main>
-<script src="../data.js"></script>
-<script src="app.js"></script>
+  <header class="mast">
+    <div class="wrap mast-inner">
+      <a class="brand" href="#radar"><span class="brand-icon" aria-hidden="true">⌖</span> Token Radar</a>
+      <nav aria-label="Views">
+        <button type="button" data-view="radar" aria-current="page">Radar</button>
+        <button type="button" data-view="model">Valuation model</button>
+        <button type="button" data-view="live">Tokenized</button>
+      </nav>
+      <span class="source"><i></i> DEFILLAMA <span id="date"></span></span>
+    </div>
+  </header>
+  <main class="wrap">
+    <section id="radar">
+      <div class="hero">
+        <div class="scope" aria-hidden="true"><span></span><span></span><span></span><i></i><b></b><em></em></div>
+        <div class="hero-copy">
+          <p class="eyebrow">PRE-TOKEN RESEARCH / SEALED SNAPSHOT</p>
+          <h1>Launch radar<span>.</span></h1>
+          <p>Rank protocols with no recorded token by implied launch value.<br class="desktop"> Open any row for the valuation and a practical farm plan.</p>
+        </div>
+        <dl class="overview" id="overview"></dl>
+      </div>
+      <div class="section-title">
+        <div><h2>Ranked protocols</h2><p>Peer market cap / TVL, adjusted for growth and tracking age.</p></div>
+        <button type="button" class="text-button" data-view="model">How value is calculated ↗</button>
+      </div>
+      <div class="panel">
+        <div class="toolbar">
+          <div class="segments" role="group" aria-label="Protocol universe">
+            <button type="button" data-scope="all" aria-pressed="true">All protocols <b id="all-count"></b></button>
+            <button type="button" data-scope="watch" aria-pressed="false">Watchlist <b id="watch-count"></b></button>
+            <button type="button" data-scope="early" aria-pressed="false">Early <b id="early-count"></b></button>
+          </div>
+          <div class="filters">
+            <label class="search"><span aria-hidden="true">⌕</span><input id="query" type="search" aria-label="Search names, categories or chains" placeholder="Search protocols"></label>
+            <select id="category" aria-label="Category"><option value="">All categories</option></select>
+            <select id="tier" aria-label="TVL tier"><option value="">All TVL tiers</option></select>
+          </div>
+        </div>
+        <div class="scroll">
+          <table class="board">
+            <thead><tr id="columns"></tr></thead>
+            <tbody id="rows"></tbody>
+          </table>
+        </div>
+        <div class="pager">
+          <span id="results" aria-live="polite"></span>
+          <div><button type="button" id="prev" aria-label="Previous page">←</button><span id="page"></span><button type="button" id="next" aria-label="Next page">→</button></div>
+          <button type="button" id="reset" class="text-button">Reset filters</button>
+        </div>
+      </div>
+      <p class="footnote">Watchlist = the <span id="foot-watch"></span> official snapshot slugs. Early = below the <span id="floor"></span> watchlist floor. Estimates hold snapshot conditions constant. Token status reflects the snapshot.</p>
+    </section>
+    <section id="model" hidden>
+      <p class="eyebrow subhead">VALUATION MODEL</p>
+      <h1>How the radar ranks.</h1>
+      <p class="intro">Implied value estimates a market capitalization using the sealed snapshot’s TVL, comparable token market caps, seven-day TVL change and tracking age.</p>
+      <div class="equation">Implied value = TVL × peer multiple × growth factor × maturity factor</div>
+      <div class="method">
+        <article><h3>01 / Peer multiple</h3><p>Take the median of individual market cap ÷ TVL ratios among tokenized protocols with positive market cap and TVL. Categories with fewer than <b id="min-peers"></b> peers use the global median of <b id="global"></b> from <b id="sample"></b> peers.</p></article>
+        <article><h3>02 / Growth factor</h3><p>Clamp seven-day TVL change to −50 through +50 percentage points. Divide by 200 and add 1, giving 0.75× to 1.25×. Missing growth gives 1.00×.</p></article>
+        <article><h3>03 / Maturity factor</h3><p>Use days from listing to snapshot, clamped at zero and 1,095. Divide by 1,095, multiply by 0.20 and add 1. Missing age gives 1.00×. The factor ranges from 1.00× to 1.20×.</p></article>
+      </div>
+      <p class="footnote">Round to the nearest dollar with a $1 minimum. Ties use slug order. Listing age measures days tracked by DefiLlama.</p>
+      <h2>Peer multiples by category</h2>
+      <div class="panel scroll"><table>
+        <thead><tr><th>Category</th><th>Eligible peers</th><th>Category median</th><th>Multiple used</th><th>Basis</th></tr></thead>
+        <tbody id="peers"></tbody>
+      </table></div>
+    </section>
+    <section id="live" hidden>
+      <p class="eyebrow subhead">MARKET COMPARABLES</p>
+      <h1>Tokenized protocols.</h1>
+      <p class="intro"><span id="live-count"></span> snapshot protocols have a token identifier or symbol. Positive reported market caps and TVLs feed the peer model.</p>
+      <div class="panel scroll"><table>
+        <thead><tr><th>Protocol</th><th>Category</th><th class="num">TVL</th><th class="num">Market cap</th><th class="num">Market cap / TVL</th></tr></thead>
+        <tbody id="live-rows"></tbody>
+      </table></div>
+    </section>
+  </main>
+  <dialog id="detail" aria-labelledby="detail-title">
+    <div id="detail-content"></div>
+  </dialog>
 </body>
 </html>
